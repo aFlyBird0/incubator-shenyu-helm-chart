@@ -26,11 +26,11 @@ jobs:
         with:
           version: v3.8.1
 
-      - name: Update Helm Dependency
-        run: |
-          cd charts/shenyu
-          helm dependency update
-          cd ../..
+#      - name: Update Helm Dependency
+#        run: |
+#          cd charts/shenyu
+#          helm dependency update
+#          cd ../..
 
       - name: Run chart-releaser
         uses: ./.github/actions/chart-releaser-action

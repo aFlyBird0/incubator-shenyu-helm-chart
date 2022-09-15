@@ -19,11 +19,11 @@ jobs:
         with:
           version: v3.8.2
 
-      - name: Update Helm Dependency
-        run: |
-          cd charts/shenyu
-          helm dependency update
-          cd ../..
+#      - name: Update Helm Dependency
+#        run: |
+#          cd charts/shenyu
+#          helm dependency update
+#          cd ../..
 
       - name: Set up chart-testing
         uses: ./.github/actions/chart-testing-action
