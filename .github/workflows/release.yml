@@ -2,8 +2,8 @@ name: Release Charts
 
 on:
   push:
-    branches:
-      - main
+#    branches:
+#      - main
 
 jobs:
   release:
@@ -25,6 +25,12 @@ jobs:
         uses: azure/setup-helm@v1
         with:
           version: v3.8.1
+
+      - name: Update Helm Dependency
+        run: |
+          cd charts/shenyu
+          helm dependency update
+          cd ../..
 
       - name: Run chart-releaser
         uses: ./.github/actions/chart-releaser-action
