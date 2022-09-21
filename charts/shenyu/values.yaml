@@ -52,7 +52,7 @@ dataSource:
     password:
     # oracle driver class name
     driverClass: oracle.jdbc.OracleDriver
-    connectorVersion:
+    connectorVersion: 19.3.0.0
 
 #################################################
 #     application.yml of admin and bootstrap    #
