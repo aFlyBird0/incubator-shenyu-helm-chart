@@ -6,7 +6,9 @@ Helm deployment documentation written for Apache/Shenyu.
 
 [Apache/ShenYu](https://shenyu.apache.org/docs/index/) is an asynchronous, high-performance, cross-language, responsive API gateway.
 
-## Get Repo Info
+## Add Helm repository
+
+```bash
 
 ```shell
 helm repo add shenyu https://apache.github.io/shenyu-helm-chart
