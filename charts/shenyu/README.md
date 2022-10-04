@@ -98,26 +98,52 @@ Select the corresponding Chart version according to the version of ShenYu you wa
 helm install shenyu shenyu/shenyu -n=shenyu --version=0.2.0 --create-namespace
 ```
 
+### How to configure JVM options and modify Kubernetes resource quotas(Version of ShenYu > 2.5.0)
+
+* Configure JVM parameters via `admin.jvmOpts` and `bootstrap.jvmOpts`
+* Configure Kubernetes resource quotas via `admin.resources` and `bootstrap.resources`.
+
+e.g.
+
+```shell
+helm install shenyu shenyu/shenyu -n=shenyu --create-namespace \
+      --set admin.javaOpts="-Xms256m -Xmx512m" \
+      --set admin.resources.requests.memory=512Mi \
+      --set admin.resources.limits.memory=1Gi \
+      --set admin.resources.requests.cpu=500m \
+      --set admin.resources.limits.cpu=1 \
+```
+
 ## Values configuration instructions
 
 ### Global Configuration
-| configuration-item | type   | default                     | description                                                                                        |
-|--------------------|--------|-----------------------------|----------------------------------------------------------------------------------------------------|
-| replicas           | int    | `1`                         | Number of replicas                                                                                 |
-| version            | string | `"2.5.0"`                   | shenyu version, it is not recommended to modify, please install the corresponding version directly |
-| admin.enabled      | bool   | `true`                      | Whether to install shenyu-admin                                                                    |
-| admin.image        | string | `"apache/shenyu-admin"`     | shenyu-admin image                                                                                 |
-| admin.nodePort     | int    | `31095`                     | shenyu-admin NodePort                                                                              |
-| bootstrap.enabled  | bool   | `true`                      | whether to install shenyu-bootstrap                                                                |
-| bootstrap.image    | string | `"apache/shenyu-bootstrap"` | shenyu-bootstrap image                                                                             |
-| bootstrap.nodePort | int    | `31195`                     | shenyu-bootstrap NodePort                                                                          |
+| configuration item | type   | default   | description                                                                                        |
+|--------------------|--------|-----------|----------------------------------------------------------------------------------------------------|
+| replicas           | int    | `1`       | Number of replicas                                                                                 |
+| version            | string | `"2.5.0"` | shenyu version, it is not recommended to modify, please install the corresponding version directly |
+
+### shenyu-admin configuration
+| configuration item | type     | default                                                                                                       | description                |
+|--------------------|----------|---------------------------------------------------------------------------------------------------------------|----------------------------|
+| admin.nodePort     | int      | `31095`                                                                                                       | NodePort port              |
+| admin.javaOpts     | string   | [see here](https://github.com/apache/shenyu/blob/master/shenyu-dist/shenyu-admin-dist/docker/entrypoint.sh)   | JVM parameters             |
+| admin.resources    | dict     | omit                                                                                                          | K8s resource quota         |
+
+### shenyu-bootstrap configuration
+| configuration item    | type     | default                                                                                                           | description                    |
+|-----------------------|----------|-------------------------------------------------------------------------------------------------------------------|--------------------------------|
+| bootstrap.nodePort    | int      | `31195`                                                                                                           | NodePort Port                  |
+| bootstrap.javaOpts    | string   | [see here](https://github.com/apache/shenyu/blob/master/shenyu-dist/shenyu-bootstrap-dist/docker/entrypoint.sh)   | JVM parameters                 |
+| bootstrap.resources   | dict     | `{}`                                                                                                              | K8s resource quota             |
+
+Translated with www.DeepL.com/Translator (free version)                                                                     |
 
 ### Database configuration
 
 #### General database configuration
 | configuration-item     | type   | default | description                                     |
 |------------------------|--------|---------|-------------------------------------------------|
-| dataSource.active      | string | `"h2"`  | Database to use, supports `h2`, `mysql`, `pg`   |
+| dataSource.active      | string | `"h2"`  | Database to use, supports `h2`, `mysql`         |
 | dataSource.initEnabled | bool   | `true`  | Initialize the database, only `h2` is available |
 
 #### h2
@@ -127,30 +153,30 @@ helm install shenyu shenyu/shenyu -n=shenyu --version=0.2.0 --create-namespace
 | dataSource.h2.password | string | `"sa"`  | password    |
 
 #### MySQL
-| Configuration Item                | Type   | Default                      | Description                                                                                           |
-|-----------------------------------|--------|------------------------------|-------------------------------------------------------------------------------------------------------|
-| dataSource.mysql.ip               | string | `""`                         | IP                                                                                                    |
-| dataSource.mysql.port             | int    | `3306`                       | port                                                                                                  |
-| dataSource.mysql.username         | string | `"root"`                     | Username                                                                                              |
-| dataSource.mysql.password         | string | `""`                         | Password                                                                                              |
-| dataSource.mysql.driverClass      | string | `"com.mysql.cj.jdbc.Driver"` | mysql driver class name                                                                               |
-| dataSource.mysql.connectorVersion | string | `"8.0.23"`                   | connector version([maven connector list](https://repo1.maven.org/maven2/mysql/mysql-connector-java/)) |
+| Configuration Item                | Type   | Default                      | Description                                                                                            |
+|-----------------------------------|--------|------------------------------|--------------------------------------------------------------------------------------------------------|
+| dataSource.mysql.ip               | string | `""`                         | IP                                                                                                     |
+| dataSource.mysql.port             | int    | `3306`                       | port                                                                                                   |
+| dataSource.mysql.username         | string | `"root"`                     | Username                                                                                               |
+| dataSource.mysql.password         | string | `""`                         | Password                                                                                               |
+| dataSource.mysql.driverClass      | string | `"com.mysql.cj.jdbc.Driver"` | mysql driver class name                                                                                |
+| dataSource.mysql.connectorVersion | string | `"8.0.23"`                   | connector version([maven connector list](https://repo1.maven.org/maven2/mysql/mysql- connector-java/)) |
 
 ### PostgreSQL
-| configuration-item             | type   | default           | description                                                                                           |
-|--------------------------------|--------|-------------------|-------------------------------------------------------------------------------------------------------|
-| dataSource.pg.ip               | string | `""`              | IP                                                                                                    |
-| dataSource.pg.port             | int    | `5432`            | port                                                                                                  |
-| dataSource.pg.username         | string | `"postgres"`      | username                                                                                              |
-| dataSource.pg.password         | string | `"postgres"`      | password                                                                                              |
-| dataSource.pg.driverClass      | string | `"org.pg.Driver"` | PostgreSQL driver class name                                                                          |
-| dataSource.pg.connectorVersion | string | `"42.2.18"`       | connector version ([maven connector list](https://repo1.maven.org/maven2/org/postgresql/postgresql/)) |
+| configuration-item                     | type   | default                   | description                                                                                            |
+|----------------------------------------|--------|---------------------------|--------------------------------------------------------------------------------------------------------|
+| dataSource.postgresql.ip               | string | `""`                      | IP                                                                                                     |
+| dataSource.postgresql.port             | int    | `5432`                    | port                                                                                                   |
+| dataSource.postgresql.username         | string | `"postgres"`              | username                                                                                               |
+| dataSource.postgresql.password         | string | `"postgres"`              | password                                                                                               |
+| dataSource.postgresql.driverClass      | string | `"org.postgresql.Driver"` | postgresql driver class name                                                                           |
+| dataSource.postgresql.connectorVersion | string | `"42.2.18"`               | connector version ([maven connector list](https://repo1.maven.org/maven2/org/ postgresql/postgresql/)) |
 
 ### application.yml configuration
-| configuration-item          | type   | default  | description                                                                                                                                          |
-|-----------------------------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| applicationConfig.bootstrap | string | slightly | bootstrap configuration, [bootstrap configuration description](https://shenyu.apache.org/zh/docs/user-guide/property-config/gateway-property-config) |
-| applicationConfig.admin     | string | omit     | admin configuration, [admin configuration description](https://shenyu.apache.org/zh/docs/user-guide/property-config/admin-property-config)           |
+| configuration-item          | type   | default  | description                                                                                                                                           |
+|-----------------------------|--------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| applicationConfig.bootstrap | string | slightly | bootstrap configuration, [bootstrap configuration description](https://shenyu.apache.org/zh/docs/user-guide/property-config/ gateway-property-config) |
+| applicationConfig.admin     | string | omit     | admin configuration, [admin configuration description](https://shenyu.apache.org/zh/docs/user-guide/property-config/admin-property- config)           |
 
 ---
 
@@ -251,19 +277,43 @@ shenyu/shenyu   0.2.0           2.5.0         Helm Chart for deploying Apache Sh
 helm install shenyu shenyu/shenyu -n=shenyu --version=0.2.0 --create-namespace
 ```
 
+### 如何配置 JVM 参数以及修改 Kubernetes 资源配额(ShenYu 版本 > 2.5.0)
+
+* 通过 `admin.javaOpts` 和 `bootstrap.javaOpts` 来配置 JVM 参数
+* 通过 `admin.resources` 和 `bootstrap.resources` 来配置 Kubernetes 资源配额。
+
+例：
+
+```shell
+helm install shenyu shenyu/shenyu -n=shenyu --create-namespace \
+      --set admin.javaOpts="-Xms256m -Xmx512m" \
+      --set admin.resources.requests.memory=512Mi \
+      --set admin.resources.limits.memory=1Gi \
+      --set admin.resources.requests.cpu=500m \
+      --set admin.resources.limits.cpu=1 \
+```
+
 ## Values 配置说明
 
 ### 全局配置
-| 配置项              | 类型    | 默认值                       | 描述                                   |
-|--------------------|--------|-----------------------------|---------------------------------------|
-| replicas           | int    | `1`                         | 副本数量                               |
-| version            | string | `"2.5.0"`                   | shenyu 版本，不建议修改，请直接安装对应版本 |
-| admin.enabled      | bool   | `true`                      | 是否安装 shenyu-admin                  |
-| admin.image        | string | `"apache/shenyu-admin"`     | shenyu-admin 镜像                      |
-| admin.nodePort     | int    | `31095`                     | shenyu-admin NodePort 端口             |
-| bootstrap.enabled  | bool   | `true`                      | 是否安装 shenyu-bootstrap              |
-| bootstrap.image    | string | `"apache/shenyu-bootstrap"` | shenyu-bootstrap 镜像                  |
-| bootstrap.nodePort | int    | `31195`                     | shenyu-bootstrap NodePort 端口         |
+| 配置项    | 类型    | 默认值     | 描述                                   |
+|----------|--------|-----------|---------------------------------------|
+| replicas | int    | `1`       | 副本数量                               |
+| version  | string | `"2.5.0"` | shenyu 版本，不建议修改，请直接安装对应版本 |
+
+### shenyu-admin 配置
+| 配置项             | 类型      | 默认值                                                                                                         | 描述             |
+|-------------------|----------|---------------------------------------------------------------------------------------------------------------|-----------------|
+| admin.nodePort    | int      | `31095`                                                                                                       | NodePort 端口    |
+| admin.javaOpts    | string   | [详见这里](https://github.com/apache/shenyu/blob/master/shenyu-dist/shenyu-admin-dist/docker/entrypoint.sh)    | JVM 参数         |
+| admin.resources   | dict     | 略                                                                                                            | K8s 资源配额     |
+
+### shenyu-bootstrap 配置
+| 配置项                 | 类型      | 默认值                                                                                                             | 描述                 |
+|-----------------------|----------|-------------------------------------------------------------------------------------------------------------------|---------------------|
+| bootstrap.nodePort    | int      | `31195`                                                                                                           | NodePort 端口        |
+| bootstrap.javaOpts    | string   | [详见这里](https://github.com/apache/shenyu/blob/master/shenyu-dist/shenyu-bootstrap-dist/docker/entrypoint.sh)    | JVM 参数             |
+| bootstrap.resources   | dict     | `{}`                                                                                                              | K8s 资源配额         |
 
 ### 数据库配置
 
@@ -290,14 +340,14 @@ helm install shenyu shenyu/shenyu -n=shenyu --version=0.2.0 --create-namespace
 | dataSource.mysql.connectorVersion | string | `"8.0.23"`                   | connector 版本([maven connector 列表](https://repo1.maven.org/maven2/mysql/mysql-connector-java/)) |
 
 ### PostgreSQL
-| 配置项                          | 类型    | 默认值                     | 描述                                                                                              |
-|--------------------------------|--------|---------------------------|--------------------------------------------------------------------------------------------------|
-| dataSource.pg.ip               | string | `""`                      | IP                                                                                               |
-| dataSource.pg.port             | int    | `5432`                    | 端口                                                                                              |
-| dataSource.pg.username         | string | `"postgres"`              | 用户名                                                                                            |
-| dataSource.pg.password         | string | `""`                      | 密码                                                                                              |
-| dataSource.pg.driverClass      | string | `"org.postgresql.Driver"` | postgresql driver class 名字                                                                      |
-| dataSource.pg.connectorVersion | string | `"42.2.18"`               | connector 版本([maven connector 列表](https://repo1.maven.org/maven2/org/postgresql/postgresql/)) |
+| 配置项                                  | 类型    | 默认值                     | 描述                                                                                              |
+|----------------------------------------|--------|---------------------------|--------------------------------------------------------------------------------------------------|
+| dataSource.postgresql.ip               | string | `""`                      | IP                                                                                               |
+| dataSource.postgresql.port             | int    | `5432`                    | 端口                                                                                              |
+| dataSource.postgresql.username         | string | `"postgres"`              | 用户名                                                                                            |
+| dataSource.postgresql.password         | string | `""`                      | 密码                                                                                              |
+| dataSource.postgresql.driverClass      | string | `"org.postgresql.Driver"` | postgresql driver class 名字                                                                      |
+| dataSource.postgresql.connectorVersion | string | `"42.2.18"`               | connector 版本([maven connector 列表](https://repo1.maven.org/maven2/org/postgresql/postgresql/)) |
 
 ### application.yml 配置
 | 配置项                       | 类型    | 默认值 | 描述                                                                                                                      |
